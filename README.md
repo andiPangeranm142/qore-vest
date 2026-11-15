@@ -85,11 +85,17 @@ the same evidence with explorer links.
 | claim (second, remainder) — 35,000 QVEST | [`0x9e015196…`](https://explore.qore.network/tx/AB8E8AF5BC902B4A55069E2E318B4EC89BBFCCC70FFA75C4B8D0D44579728F20) — allowance == 50,000 QVEST total ✓ |
 | createVesting (video account, 25,000 QVEST, no cliff, 300s) | [`0xe78305bc…`](https://explore.qore.network/tx/1040FDE84F43C2E42746DF20614FD111EBC2622DA92D5558DE8CAE33BA734649) |
 | claim (video account, on camera) — 25,000 QVEST | [`0x95d0dcbe…`](https://explore.qore.network/tx/387A7DF2673D9ECE685A18D78505D4542C4CF1DDA957A586D092F3ED75A8661E) — allowance == 25,000 QVEST total ✓ |
+| createVesting (live-demo account, 50,000 QVEST, cliff 7d, 30d) | [`0x9532d8ad…`](https://explore.qore.network/tx/A3B90F2BFA1D723868214C6272B9F1F02D3CBF74AE830AEB28BF85E1CCF3B76E) — stays locked, unclaimed |
 
 Final state: all three schedules fully claimed; Native allowance equals
 total claimed for each beneficiary (100,000, 50,000, and 25,000 WDT
 units). The video claim is the one shown in
 [`docs/demo.mp4`](docs/demo.mp4) (1:47, real screen recording).
+
+A fourth schedule (50,000 QVEST, 7-day cliff, 30-day duration, created
+16 Nov 2026 via `scripts/live-schedule.ts`) stays locked and unclaimed so
+the demo keeps showing live locked funds through judging; it is not part
+of the claim evidence above.
 
 > **Duplicate deployment (honest note).** During the usage run, an
 > unguarded `main()` in `scripts/deploy.ts` fired when `usage.ts`

@@ -76,6 +76,17 @@
       "invariantHolds": true,
       "evmTx": "0x9e01519646de26de7318f10c608c0e61f92c5d37fb36769e5831d5eba29c71d1",
       "cosmosTx": "AB8E8AF5BC902B4A55069E2E318B4EC89BBFCCC70FFA75C4B8D0D44579728F20"
+    },
+    {
+      "action": "createVesting",
+      "note": "Live demo state: keeps the demo showing locked funds through judging. Stays locked and unclaimed.",
+      "beneficiary": "0x0A9F2F8fAc9E286D140f9C115D8C4DD28904507b",
+      "amount": "50000000000",
+      "start": 1794778318,
+      "cliff": 604800,
+      "duration": 2592000,
+      "evmTx": "0x9532d8adf85851f80e81483a32d06a0b6d2bb42a4c5b984c33f952926195b53f",
+      "cosmosTx": "A3B90F2BFA1D723868214C6272B9F1F02D3CBF74AE830AEB28BF85E1CCF3B76E"
     }
   ],
   "finalVerification": {
