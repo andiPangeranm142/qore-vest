@@ -119,6 +119,16 @@ export const USAGE_EVIDENCE: UsageEvidence = {
       "duration": 2592000,
       "evmTx": "0x9532d8adf85851f80e81483a32d06a0b6d2bb42a4c5b984c33f952926195b53f",
       "cosmosTx": "A3B90F2BFA1D723868214C6272B9F1F02D3CBF74AE830AEB28BF85E1CCF3B76E"
+    },
+    {
+      "action": "createVesting (Q-Day Drill)",
+      "beneficiary": "0xd40fcee41591b61a7a72ec4ecb9003aee35c8e26",
+      "amount": "10000000000",
+      "start": 1794779491,
+      "cliff": 0,
+      "duration": 604800,
+      "evmTx": "0x0a0d0c76bffb2259b5a5222716d935c58a4b27f8f702c7e4aca9d1863a1b25b0",
+      "cosmosTx": "16FF820CD3DF1DB4F4ABBE881573A56B0D5A5EF83FB631085F6985567A3722C3"
     }
   ],
   "finalVerification": {

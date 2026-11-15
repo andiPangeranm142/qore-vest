@@ -51,6 +51,8 @@ the whole claim reverts and no QVEST moves.
 | EVM window opened | `DF01598868ABA88ABCE853D26E4DC8B14F751D094CE4DF336222879C4CC5E743` (hybrid-signed native tx; 1200 blocks, 10 txs) |
 | Second beneficiary (EVM) | `0xD2C678D480690c48e9C909340685AD856f7ddDaE` |
 | Second beneficiary (Cosmos) | `qor16tr834yqdyxy36wfpy6qdpdds4hhmhdwqu2f3v` |
+| Drill beneficiary (EVM) | `0xd40fcee41591b61a7a72ec4ecb9003aee35c8e26` |
+| Drill beneficiary (Cosmos) | `qor16s8uaeq4jxmp57nja38vhyqr4m34er3x7ft3xf` |
 | Explorer | https://explore.qore.network (switch to Testnet) |
 
 > Explorer transaction links use the Cosmos hash of each EVM transaction:
@@ -86,6 +88,7 @@ the same evidence with explorer links.
 | createVesting (video account, 25,000 QVEST, no cliff, 300s) | [`0xe78305bc…`](https://explore.qore.network/tx/1040FDE84F43C2E42746DF20614FD111EBC2622DA92D5558DE8CAE33BA734649) |
 | claim (video account, on camera) — 25,000 QVEST | [`0x95d0dcbe…`](https://explore.qore.network/tx/387A7DF2673D9ECE685A18D78505D4542C4CF1DDA957A586D092F3ED75A8661E) — allowance == 25,000 QVEST total ✓ |
 | createVesting (live-demo account, 50,000 QVEST, cliff 7d, 30d) | [`0x9532d8ad…`](https://explore.qore.network/tx/A3B90F2BFA1D723868214C6272B9F1F02D3CBF74AE830AEB28BF85E1CCF3B76E) — stays locked, unclaimed |
+| createVesting (drill account, 10,000 QVEST, no cliff, 7d) | [`0x0a0d0c76…`](https://explore.qore.network/tx/16FF820CD3DF1DB4F4ABBE881573A56B0D5A5EF83FB631085F6985567A3722C3) — Q-Day Drill schedule, claimed once on drill day |
 
 Final state: all three schedules fully claimed; Native allowance equals
 total claimed for each beneficiary (100,000, 50,000, and 25,000 WDT
@@ -96,6 +99,13 @@ A fourth schedule (50,000 QVEST, 7-day cliff, 30-day duration, created
 16 Nov 2026 via `scripts/live-schedule.ts`) stays locked and unclaimed so
 the demo keeps showing live locked funds through judging; it is not part
 of the claim evidence above.
+
+A fifth schedule (10,000 QVEST, no cliff, 7-day duration, created
+16 Nov 2026 via `scripts/drill-schedule.ts`) belongs to the Q-Day Drill
+beneficiary (`qor16s8uaeq4jxmp57nja38vhyqr4m34er3x7ft3xf`); it is claimed
+once on drill day (18 Nov 2026) as the drill proof transaction, via
+`scripts/drill-claim.ts`. Together the two locked schedules make
+`totalLocked` 60,000 QVEST (50,000 live-demo + 10,000 drill).
 
 > **Duplicate deployment (honest note).** During the usage run, an
 > unguarded `main()` in `scripts/deploy.ts` fired when `usage.ts`

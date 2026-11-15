@@ -17,9 +17,13 @@
  * Chromium cannot use the VM's egress proxy directly (it resolves only to
  * an IPv6 address, and the proxy MITM-signs TLS with its own CA), so the
  * script runs the same localhost TCP forwarder the video-recorder uses
- * (127.0.0.1:3129 -> proxy IPv6:3128) and launches Chromium through it
+ * (127.0.0.1:3134 -> proxy IPv6:3128) and launches Chromium through it
  * with ignoreHTTPSErrors. Without this, the app's RPC reads fail with
  * ERR_TUNNEL_CONNECTION_FAILED and the live totals show "…".
+ *
+ * Port 3134 (not the video-recorder's 3129): 3129 often collides with
+ * other agents' forwarders on this shared VM. Override with
+ * QV_FORWARDER_PORT if 3134 is taken.
  */
 import { createRequire } from "node:module";
 import net from "node:net";
@@ -28,7 +32,9 @@ import dns from "node:dns/promises";
 const require = createRequire("/home/hatch/workspace/codegeist/video-recorder/package.json");
 const { chromium } = require("playwright");
 
-async function startForwarder(localPort = 3129) {
+const FORWARDER_PORT = Number(process.env.QV_FORWARDER_PORT ?? 3134);
+
+async function startForwarder(localPort = FORWARDER_PORT) {
   const raw = process.env.https_proxy || process.env.HTTPS_PROXY || "";
   const u = new URL(raw);
   const target = await dns.lookup(u.hostname, { family: 6 });
@@ -52,7 +58,7 @@ const screenshotPath = process.argv[3] ?? "/tmp/qv-render.png";
 
 const forwarder = await startForwarder();
 const browser = await chromium.launch({
-  proxy: { server: "http://127.0.0.1:3129", bypass: "localhost,127.0.0.1" },
+  proxy: { server: `http://127.0.0.1:${FORWARDER_PORT}`, bypass: "localhost,127.0.0.1" },
 });
 const context = await browser.newContext({
   viewport: { width: 1280, height: 800 },
@@ -77,10 +83,11 @@ const checks = {
   "contract address": text.includes("0x67e4862c388a5ead666f5ac340fe9ef2fc1f8f68"),
   "live total supply (1,000,000 QVEST)": text.includes("1,000,000.00 QVEST"),
   // A fourth schedule (50,000 QVEST, created 16 Nov 2026 via
-  // scripts/live-schedule.ts) stays locked through judging, so
-  // totalLocked is 50,000 — the read succeeding (rather than showing
-  // "…") is what this check proves.
-  "live locked total (50,000.00 QVEST, live demo schedule)": text.includes("locked in schedules: 50,000.00 QVEST"),
+  // scripts/live-schedule.ts) stays locked through judging, and a fifth
+  // (10,000 QVEST Q-Day Drill schedule, created 16 Nov 2026 via
+  // scripts/drill-schedule.ts) is locked too, so totalLocked is 60,000 —
+  // the read succeeding (rather than showing "…") is what this check proves.
+  "live locked total (60,000.00 QVEST, live demo + drill schedules)": text.includes("locked in schedules: 60,000.00 QVEST"),
   "how it works": text.includes("How it works"),
   "connect prompt": text.includes("Connect a wallet"),
   "evidence section": text.includes("Verified on-chain evidence"),
