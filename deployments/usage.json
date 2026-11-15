@@ -79,7 +79,6 @@
     },
     {
       "action": "createVesting",
-      "note": "Live demo state: keeps the demo showing locked funds through judging. Stays locked and unclaimed.",
       "beneficiary": "0x0A9F2F8fAc9E286D140f9C115D8C4DD28904507b",
       "amount": "50000000000",
       "start": 1794778318,

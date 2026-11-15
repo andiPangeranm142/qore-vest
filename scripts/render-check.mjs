@@ -76,9 +76,11 @@ const checks = {
   "contract section": text.includes("Contract"),
   "contract address": text.includes("0x67e4862c388a5ead666f5ac340fe9ef2fc1f8f68"),
   "live total supply (1,000,000 QVEST)": text.includes("1,000,000.00 QVEST"),
-  // Both demo schedules are fully claimed, so totalLocked is 0 — the read
-  // succeeding (rather than showing "…") is what this check proves.
-  "live locked total (0.00 QVEST, schedules fully claimed)": text.includes("locked in schedules: 0.00 QVEST"),
+  // A fourth schedule (50,000 QVEST, created 16 Nov 2026 via
+  // scripts/live-schedule.ts) stays locked through judging, so
+  // totalLocked is 50,000 — the read succeeding (rather than showing
+  // "…") is what this check proves.
+  "live locked total (50,000.00 QVEST, live demo schedule)": text.includes("locked in schedules: 50,000.00 QVEST"),
   "how it works": text.includes("How it works"),
   "connect prompt": text.includes("Connect a wallet"),
   "evidence section": text.includes("Verified on-chain evidence"),
