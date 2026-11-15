@@ -150,8 +150,20 @@ All fixes are covered by the passing test suite (`npm test`: 9/9).
 | No secrets in repo / git history | Checked (see below) |
 | Testnet deploy | **Done 16 Nov 2026 02:52 WIB** — contract `0x67e4862c…f8f68`, deploy tx `0x498b8231…`, Cosmos hash `71E9E424…` |
 | On-chain usage run | **Done 16 Nov 2026** — 2 schedules, 4 claims, 1 forced revert; Native invariant held after every claim (see `deployments/usage.json`) |
-| Demo video (≤3 min, real recording) | Done + verified with ffprobe |
+| Demo video (≤3 min, real recording) | **Done 16 Nov 2026** — `docs/demo.mp4`, 106.6 s (1:47), 1920×1080 H.264, real Playwright screen recording of a live claim (25,000 QVEST, video account), burned-in captions, explorer confirmation on camera; frames verified at 6 timestamps |
 | Live demo (GitHub Pages) | Done — https://andipangeranm142.github.io/qore-vest/ |
+
+Two bugs were found and fixed during the video work (16 Nov 2026):
+`App.tsx` used Node's `Buffer.from` in the browser, which crashed the
+connected view ("Buffer is not defined") — replaced with viem's
+`hexToBytes`. And the Native allowance read used the Tendermint RPC,
+which sends no CORS headers, so the browser could not reach it — it now
+goes through the testnet REST API's CosmWasm smart-query endpoint via
+the dev proxy, like the window-status read. The recording itself used
+a small Node static server with a fetch-based `/lcd-testnet` proxy
+(`video/serve.mjs`, outside the repo) because Vite's http-proxy cannot
+do TLS through this sandbox's egress proxy and every proxied request
+500s; the app code is unchanged and still reads through `/lcd-testnet`.
 
 ## Secrets check
 

@@ -83,9 +83,13 @@ the same evidence with explorer links.
 | claim (deployer, wrong Native address) — forced revert | [`0xae63c349…`](https://explore.qore.network/tx/9A3402F8000FCE13FCE344F8F46DD682FE818CC59ABC9B9AF86C64B2FB03CA72) — reverted, no state changed ✓ |
 | claim (deployer, remainder) — 95,666.67 QVEST | [`0xda739584…`](https://explore.qore.network/tx/49FB10BDEA7007A68216B26FA47D5D9A2143610B8D2FBA90ED47EC81A4109989) — allowance == 100,000 QVEST total ✓ |
 | claim (second, remainder) — 35,000 QVEST | [`0x9e015196…`](https://explore.qore.network/tx/AB8E8AF5BC902B4A55069E2E318B4EC89BBFCCC70FFA75C4B8D0D44579728F20) — allowance == 50,000 QVEST total ✓ |
+| createVesting (video account, 25,000 QVEST, no cliff, 300s) | [`0xe78305bc…`](https://explore.qore.network/tx/1040FDE84F43C2E42746DF20614FD111EBC2622DA92D5558DE8CAE33BA734649) |
+| claim (video account, on camera) — 25,000 QVEST | [`0x95d0dcbe…`](https://explore.qore.network/tx/387A7DF2673D9ECE685A18D78505D4542C4CF1DDA957A586D092F3ED75A8661E) — allowance == 25,000 QVEST total ✓ |
 
-Final state: both schedules fully claimed; Native allowance equals total
-claimed for each beneficiary (100,000 and 50,000 WDT units).
+Final state: all three schedules fully claimed; Native allowance equals
+total claimed for each beneficiary (100,000, 50,000, and 25,000 WDT
+units). The video claim is the one shown in
+[`docs/demo.mp4`](docs/demo.mp4) (1:47, real screen recording).
 
 > **Duplicate deployment (honest note).** During the usage run, an
 > unguarded `main()` in `scripts/deploy.ts` fired when `usage.ts`

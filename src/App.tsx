@@ -1,5 +1,4 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import {
   classifyEvmWindowRejection,
   evmWindowStatus,
@@ -8,6 +7,7 @@ import {
 import { addressesFrom20 } from "@qorechain/sdk";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { hexToBytes } from "viem";
 import {
   useAccount,
   useReadContract,
@@ -43,13 +43,9 @@ const REMEDY: Record<EvmWindowRejection, string> = {
 /**
  * The testnet REST API through the dev server's proxy (vite.config.ts):
  * the public REST endpoint sends no CORS headers. On a plain static host
- * (GitHub Pages) this read fails and the window section degrades gracefully
- * — claims still work when the wallet already has a live window open.
+ * (GitHub Pages) these reads fail and the sections degrade gracefully.
  */
 const REST_PROXY = "/lcd-testnet";
-
-/** The testnet Tendermint RPC, for the Native allowance read. */
-const TENDERMINT_RPC = "https://rpc-testnet.qore.host";
 
 const QVEST_DECIMALS = 6n;
 
@@ -117,19 +113,25 @@ function WindowStatus({ address, chainId }: { address: `0x${string}`; chainId: n
 
 /**
  * The Native cw20 allowance the contract holds for this beneficiary — the
- * cross-VM vesting ledger. Read straight from the Native contract over the
- * Tendermint RPC. If the browser cannot reach it (CORS), the section
+ * cross-VM vesting ledger. Read from the Native contract over the testnet
+ * REST API's CosmWasm smart-query endpoint, through the dev proxy (the
+ * public endpoints send no CORS headers, so the browser cannot query the
+ * RPC or REST directly). If the read fails (static host), the section
  * degrades to a pointer at the verified evidence below.
  */
 function NativeAllowance({ spender, contractNative }: { spender: string; contractNative: string }) {
   const { data, error, isLoading } = useQuery({
     queryKey: ["native-allowance", spender],
     queryFn: async () => {
-      const cw = await CosmWasmClient.connect(TENDERMINT_RPC);
-      const res = (await cw.queryContractSmart(NATIVE_TARGET, {
-        allowance: { owner: contractNative, spender },
-      })) as { allowance: string };
-      return BigInt(res.allowance);
+      const query = encodeURIComponent(
+        btoa(JSON.stringify({ allowance: { owner: contractNative, spender } })),
+      );
+      const res = await fetch(
+        `${REST_PROXY}/cosmwasm/wasm/v1/contract/${NATIVE_TARGET}/smart/${query}`,
+      );
+      if (!res.ok) throw new Error(`allowance query failed: HTTP ${res.status}`);
+      const json = (await res.json()) as { data: { allowance: string } };
+      return BigInt(json.data.allowance);
     },
     retry: false,
     staleTime: 15_000,
@@ -138,8 +140,9 @@ function NativeAllowance({ spender, contractNative }: { spender: string; contrac
   if (error || data === undefined)
     return (
       <p>
-        Native allowance: could not be read from this host. The verified
-        allowance reads from the usage run are in the evidence section below.
+        Native allowance: could not be read from this host (the testnet APIs
+        send no CORS headers on a static host). The verified allowance reads
+        from the usage run are in the evidence section below.
       </p>
     );
   return (
@@ -156,9 +159,11 @@ function ClaimPanel({ address }: { address: `0x${string}` }) {
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<string>("");
   const [claimHash, setClaimHash] = useState<string>("");
-  const nativeAddress = addressesFrom20(Buffer.from(address.slice(2), "hex")).cosmos;
+  // hexToBytes, not Buffer: Buffer is a Node API and does not exist in the
+  // browser (this crashed the connected view until it was fixed).
+  const nativeAddress = addressesFrom20(hexToBytes(address)).cosmos;
   const contractNative = QORE_VEST_ADDRESS
-    ? addressesFrom20(Buffer.from(QORE_VEST_ADDRESS.slice(2), "hex")).cosmos
+    ? addressesFrom20(hexToBytes(QORE_VEST_ADDRESS)).cosmos
     : "";
 
   const { data: reads, refetch } = useReadContracts({
