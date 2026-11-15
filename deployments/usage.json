@@ -1,0 +1,98 @@
+{
+  "network": "qorechain-diana",
+  "chainId": 9800,
+  "contract": "0x67e4862c388a5ead666f5ac340fe9ef2fc1f8f68",
+  "contractNativeAddress": "qor1vljgvtpc3f026en0ttp5pl577t7plrmgce7vdj",
+  "nativeTarget": "qor14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s93uuqt",
+  "steps": [
+    {
+      "action": "createVesting",
+      "beneficiary": "0x1F6A09E6aC96a2Ae802828B19d31B0284b841B9d",
+      "amount": "100000000000",
+      "start": 1794771573,
+      "cliff": 60,
+      "duration": 600,
+      "evmTx": "0x13e4126b91f3a8fa57e5066551a5b399c585bb5d4a7a70c401fee50d5cf8c6b3",
+      "cosmosTx": "4A364375CE13E08A3651C46238FBF0BF0EF80039E4DF20ADE6ACDFEABDAE769F"
+    },
+    {
+      "action": "createVesting",
+      "beneficiary": "0xD2C678D480690c48e9C909340685AD856f7ddDaE",
+      "amount": "50000000000",
+      "start": 1794771573,
+      "cliff": 0,
+      "duration": 300,
+      "evmTx": "0x1078fdffded184f41efa06b1e66da3520cb188f4198cfbac0453e841ed086979",
+      "cosmosTx": "691EE1CB06EB953031E33D7F4BA37D776E8508B7C3678984E21E66E189D805CB"
+    },
+    {
+      "action": "claim",
+      "beneficiary": "0x1F6A09E6aC96a2Ae802828B19d31B0284b841B9d",
+      "status": "success",
+      "claimedTotal": "4333333333",
+      "qvestBalance": "4333333333",
+      "nativeAllowance": "4333333333",
+      "invariantHolds": true,
+      "evmTx": "0xcc635b9ef007e671c823ee1f53639614a669ac25de9c3c29321f2a72e0fb4687",
+      "cosmosTx": "AE295D060AC54A19D141150DC00BC4E24DEBC156795B079A7E35343CC1FA43F1"
+    },
+    {
+      "action": "claim",
+      "beneficiary": "0xD2C678D480690c48e9C909340685AD856f7ddDaE",
+      "status": "success",
+      "claimedTotal": "15000000000",
+      "qvestBalance": "15000000000",
+      "nativeAllowance": "15000000000",
+      "invariantHolds": true,
+      "evmTx": "0xa117b2a50ad9ca5dd4a9d5afa5e336b1d844ea51ffdc5d3e52be9ad5e7acc47e",
+      "cosmosTx": "84581A1F0ED7A7BD185F62AC9A861BDB84BF5BA51F0E6B1E94931FEF83C3BD3C"
+    },
+    {
+      "action": "claim (forced revert)",
+      "beneficiary": "0x1F6A09E6aC96a2Ae802828B19d31B0284b841B9d",
+      "status": "reverted",
+      "stateUnchanged": true,
+      "evmTx": "0xae63c3499f9657b0ab981609213f0e7db9035d557ce60bccd859557d75e100dc",
+      "cosmosTx": "9A3402F8000FCE13FCE344F8F46DD682FE818CC59ABC9B9AF86C64B2FB03CA72"
+    },
+    {
+      "action": "claim (remainder)",
+      "beneficiary": "0x1F6A09E6aC96a2Ae802828B19d31B0284b841B9d",
+      "status": "success",
+      "claimedTotal": "100000000000",
+      "qvestBalance": "100000000000",
+      "nativeAllowance": "100000000000",
+      "invariantHolds": true,
+      "evmTx": "0xda739584960a1992f6126e466769cc572463b48504ff8b143a033230e1e87936",
+      "cosmosTx": "49FB10BDEA7007A68216B26FA47D5D9A2143610B8D2FBA90ED47EC81A4109989"
+    },
+    {
+      "action": "claim (remainder)",
+      "beneficiary": "0xD2C678D480690c48e9C909340685AD856f7ddDaE",
+      "status": "success",
+      "claimedTotal": "50000000000",
+      "qvestBalance": "50000000000",
+      "nativeAllowance": "50000000000",
+      "invariantHolds": true,
+      "evmTx": "0x9e01519646de26de7318f10c608c0e61f92c5d37fb36769e5831d5eba29c71d1",
+      "cosmosTx": "AB8E8AF5BC902B4A55069E2E318B4EC89BBFCCC70FFA75C4B8D0D44579728F20"
+    }
+  ],
+  "finalVerification": {
+    "deployer": {
+      "totalClaimed": "100000000000",
+      "expectedTotal": "100000000000",
+      "fullyClaimed": true,
+      "nativeAllowance": "100000000000",
+      "invariantHolds": true
+    },
+    "second": {
+      "totalClaimed": "50000000000",
+      "expectedTotal": "50000000000",
+      "fullyClaimed": true,
+      "nativeAllowance": "50000000000",
+      "invariantHolds": true
+    }
+  },
+  "ranAt": "2026-11-15T19:39:33.405Z"
+}
