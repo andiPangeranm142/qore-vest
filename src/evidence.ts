@@ -15,6 +15,7 @@ export type EvidenceStep = {
   cliff?: number;
   duration?: number;
   status?: string;
+  note?: string;
   claimedTotal?: string;
   qvestBalance?: string;
   nativeAllowance?: string;
