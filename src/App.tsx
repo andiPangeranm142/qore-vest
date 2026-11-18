@@ -357,9 +357,11 @@ function Evidence() {
     <section style={card}>
       <h2>Verified on-chain evidence</h2>
       <p>
-        The usage run ({new Date(USAGE_EVIDENCE.ranAt).toLocaleString("en-GB")}) exercised the
-        full flow on the Diana testnet: two schedules, four claims, one forced
-        revert. Every claim verified the invariant{" "}
+        The evidence below — the usage run (
+        {new Date(USAGE_EVIDENCE.ranAt).toLocaleString("en-GB")}) plus later
+        on-chain runs — covers the full flow on the Diana testnet: five
+        schedules, six claims, two forced reverts. Every claim verified the
+        invariant{" "}
         <code>allowance(QoreVest, beneficiary) == total claimed</code> by reading
         the Native contract after the transaction.
       </p>
