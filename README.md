@@ -53,6 +53,8 @@ the whole claim reverts and no QVEST moves.
 | Second beneficiary (Cosmos) | `qor16tr834yqdyxy36wfpy6qdpdds4hhmhdwqu2f3v` |
 | Drill beneficiary (EVM) | `0xd40fcee41591b61a7a72ec4ecb9003aee35c8e26` |
 | Drill beneficiary (Cosmos) | `qor16s8uaeq4jxmp57nja38vhyqr4m34er3x7ft3xf` |
+| Live-demo beneficiary (EVM) | `0x0A9F2F8fAc9E286D140f9C115D8C4DD28904507b` |
+| Live-demo beneficiary (Cosmos) | `qor1p20jlravnc5x69q0nsg4mrzd62ysg5rms7yflt` |
 | Explorer | https://explore.qore.network (switch to Testnet) |
 
 > Explorer transaction links use the Cosmos hash of each EVM transaction:
@@ -88,6 +90,7 @@ the same evidence with explorer links.
 | createVesting (video account, 25,000 QVEST, no cliff, 300s) | [`0xe78305bc…`](https://explore.qore.network/tx/1040FDE84F43C2E42746DF20614FD111EBC2622DA92D5558DE8CAE33BA734649) |
 | claim (video account, on camera) — 25,000 QVEST | [`0x95d0dcbe…`](https://explore.qore.network/tx/387A7DF2673D9ECE685A18D78505D4542C4CF1DDA957A586D092F3ED75A8661E) — allowance == 25,000 QVEST total ✓ |
 | createVesting (live-demo account, 50,000 QVEST, cliff 7d, 30d) | [`0x9532d8ad…`](https://explore.qore.network/tx/A3B90F2BFA1D723868214C6272B9F1F02D3CBF74AE830AEB28BF85E1CCF3B76E) — stays locked, unclaimed |
+| claim (live-demo account, pre-cliff) — rejected on chain | [`0xb066c478…`](https://explore.qore.network/tx/E6EDD1EE040FB1510D2902FAA4D76D7769672E047CEB5A76A2825705B2EF9353) — reverted ("nothing claimable"), no state changed ✓ |
 | createVesting (drill account, 10,000 QVEST, no cliff, 7d) | [`0x0a0d0c76…`](https://explore.qore.network/tx/16FF820CD3DF1DB4F4ABBE881573A56B0D5A5EF83FB631085F6985567A3722C3) — Q-Day Drill schedule, claimed once on drill day |
 
 Final state: all three schedules fully claimed; Native allowance equals
@@ -97,8 +100,17 @@ units). The video claim is the one shown in
 
 A fourth schedule (50,000 QVEST, 7-day cliff, 30-day duration, created
 16 Nov 2026 via `scripts/live-schedule.ts`) stays locked and unclaimed so
-the demo keeps showing live locked funds through judging; it is not part
-of the claim evidence above.
+the demo keeps showing live locked funds through judging. On 19 Nov 2026
+— four days before the cliff ends (23 Nov 2026, 04:31 WIB) — the
+beneficiary attempted a claim; it reverted on chain with `nothing
+claimable` (receipt status `reverted`, block 10335895, EVM tx
+[`0xb066c478…`](https://explore.qore.network/tx/E6EDD1EE040FB1510D2902FAA4D76D7769672E047CEB5A76A2825705B2EF9353)),
+and the post-receipt check confirmed claimed stayed 0 and `totalLocked`
+unchanged: the cliff is enforced by the contract, not by the UI. Full
+record in [`deployments/precliff-rejection.json`](deployments/precliff-rejection.json);
+reproducible via `scripts/precliff-setup.ts` + `scripts/precliff-claim.ts`
+(the beneficiary is mnemonic index 2 — the same mnemonic as the
+deployer, so no new secret is involved).
 
 A fifth schedule (10,000 QVEST, no cliff, 7-day duration, created
 16 Nov 2026 via `scripts/drill-schedule.ts`) belongs to the Q-Day Drill
@@ -343,6 +355,9 @@ scripts/
   usage.ts                   # on-chain usage run + record deployments/usage.json
   cosmos-hash.ts             # EVM tx hash -> Cosmos tx hash (explorer links)
   setup-second-account.ts    # fund + PQC-register + window for the 2nd beneficiary
+  precliff-setup.ts          # fund + PQC-register + window for the live-demo beneficiary
+  precliff-claim.ts          # the one pre-cliff claim attempt (reverts on chain)
+  precliff-state.ts          # read-only state check for the live-demo schedule
   window.ts                  # PQC key registration + EVM window helper
   build-artifact.mjs         # regenerate the artifacts from solc output
   gen-evidence.mjs           # generate src/evidence.ts from deployments/usage.json
@@ -358,6 +373,7 @@ test/
 deployments/
   testnet.json               # written by `npm run deploy`
   usage.json                 # written by `scripts/usage.ts`
+  precliff-rejection.json    # the pre-cliff rejection record (19 Nov 2026)
 docs/
   demo.mp4                   # demo video (≤3 min, real screen recording)
   featured.png               # featured image for the project page

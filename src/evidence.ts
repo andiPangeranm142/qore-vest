@@ -129,6 +129,15 @@ export const USAGE_EVIDENCE: UsageEvidence = {
       "duration": 604800,
       "evmTx": "0x0a0d0c76bffb2259b5a5222716d935c58a4b27f8f702c7e4aca9d1863a1b25b0",
       "cosmosTx": "16FF820CD3DF1DB4F4ABBE881573A56B0D5A5EF83FB631085F6985567A3722C3"
+    },
+    {
+      "action": "claim (pre-cliff rejection)",
+      "note": "Pre-cliff claim attempt on the live 50,000 QVEST schedule: reverted on chain with 'nothing claimable' — the cliff is enforced by the contract. State unchanged; the funds stay locked.",
+      "beneficiary": "0x0A9F2F8fAc9E286D140f9C115D8C4DD28904507b",
+      "status": "reverted",
+      "stateUnchanged": true,
+      "evmTx": "0xb066c4786c96c9872fc6d4c4a40ca1534b36501f360b617c5417b45c5ae7d033",
+      "cosmosTx": "E6EDD1EE040FB1510D2902FAA4D76D7769672E047CEB5A76A2825705B2EF9353"
     }
   ],
   "finalVerification": {

@@ -1,0 +1,28 @@
+{
+  "network": "qorechain-diana",
+  "chainId": 9800,
+  "contract": "0x67e4862c388a5ead666f5ac340fe9ef2fc1f8f68",
+  "action": "claim (pre-cliff rejection)",
+  "beneficiary": "0x0A9F2F8fAc9E286D140f9C115D8C4DD28904507b",
+  "beneficiaryNative": "qor1p20jlravnc5x69q0nsg4mrzd62ysg5rms7yflt",
+  "schedule": {
+    "total": "50000000000",
+    "claimed": "0",
+    "start": 1794778318,
+    "cliffSeconds": 604800,
+    "durationSeconds": 2592000,
+    "cliffEndsAt": "2026-11-22T21:31:58.000Z"
+  },
+  "simulation": {
+    "reverted": true,
+    "reason": "nothing claimable"
+  },
+  "evmTx": "0xb066c4786c96c9872fc6d4c4a40ca1534b36501f360b617c5417b45c5ae7d033",
+  "cosmosTx": "E6EDD1EE040FB1510D2902FAA4D76D7769672E047CEB5A76A2825705B2EF9353",
+  "blockNumber": "10335895",
+  "gasUsed": "400000",
+  "receiptStatus": "reverted",
+  "stateUnchanged": true,
+  "explorerTx": "https://explore.qore.network/tx/E6EDD1EE040FB1510D2902FAA4D76D7769672E047CEB5A76A2825705B2EF9353",
+  "ranAt": "2026-11-18T20:34:21.364Z"
+}
