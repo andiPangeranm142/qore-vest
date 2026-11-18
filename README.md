@@ -102,10 +102,12 @@ of the claim evidence above.
 
 A fifth schedule (10,000 QVEST, no cliff, 7-day duration, created
 16 Nov 2026 via `scripts/drill-schedule.ts`) belongs to the Q-Day Drill
-beneficiary (`qor16s8uaeq4jxmp57nja38vhyqr4m34er3x7ft3xf`); it is claimed
+beneficiary (`qor16s8uaeq4jxmp57nja38vhyqr4m34er3x7ft3xf`); it was claimed
 once on drill day (18 Nov 2026) as the drill proof transaction, via
-`scripts/drill-claim.ts`. Together the two locked schedules make
-`totalLocked` 60,000 QVEST (50,000 live-demo + 10,000 drill).
+`scripts/drill-claim.ts` — 3,046.197089 QVEST claimed. The contract
+subtracts claims from `totalLocked`, so it now reads **56,953.802911
+QVEST** (60,000 − 3,046.197089); the live-demo schedule is untouched and
+still fully locked.
 
 > **Duplicate deployment (honest note).** During the usage run, an
 > unguarded `main()` in `scripts/deploy.ts` fired when `usage.ts`

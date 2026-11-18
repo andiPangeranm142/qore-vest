@@ -85,9 +85,11 @@ const checks = {
   // A fourth schedule (50,000 QVEST, created 16 Nov 2026 via
   // scripts/live-schedule.ts) stays locked through judging, and a fifth
   // (10,000 QVEST Q-Day Drill schedule, created 16 Nov 2026 via
-  // scripts/drill-schedule.ts) is locked too, so totalLocked is 60,000 —
-  // the read succeeding (rather than showing "…") is what this check proves.
-  "live locked total (60,000.00 QVEST, live demo + drill schedules)": text.includes("locked in schedules: 60,000.00 QVEST"),
+  // scripts/drill-schedule.ts) was claimed once on drill day
+  // (3,046.197089 QVEST); the contract subtracts claims from totalLocked,
+  // so it reads 56,953.80 QVEST — the read succeeding (rather than showing
+  // "…") is what this check proves.
+  "live locked total (56,953.80 QVEST, post-drill claim)": text.includes("locked in schedules: 56,953.80 QVEST"),
   "how it works": text.includes("How it works"),
   "connect prompt": text.includes("Connect a wallet"),
   "evidence section": text.includes("Verified on-chain evidence"),
