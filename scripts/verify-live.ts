@@ -300,16 +300,23 @@ async function main(): Promise<void> {
     check("live-demo claimed is 0", liveDemoLive.claimed === 0n, `live ${fmt(liveDemoLive.claimed)}`);
   }
   const drill = liveByLabel.get("drill");
-  if (drill) {
+  const drillRow = expected.schedules.find((s) => s.label === "drill");
+  if (drill && drillRow) {
     check(
       "drill vested is between claimed and total (grows with time)",
       drill.vested >= drill.claimed && drill.vested <= drill.total,
       `vested ${fmt(drill.vested)}, claimed ${fmt(drill.claimed)}, total ${fmt(drill.total)}`,
     );
+    // vested and claimable are read in two separate RPC calls, and vesting
+    // accrues with time, so the later claimable read is always slightly
+    // larger than vested - claimed. Allow up to 120s of vesting accrual.
+    const ratePerSecond = BigInt(drillRow.total) / BigInt(drillRow.duration);
+    const tolerance = ratePerSecond * 120n + 1n;
+    const diff = drill.claimable - (drill.vested - drill.claimed);
     check(
-      "drill claimable == vested - claimed",
-      drill.claimable === drill.vested - drill.claimed,
-      `claimable ${fmt(drill.claimable)}, vested - claimed ${fmt(drill.vested - drill.claimed)}`,
+      "drill claimable == vested - claimed (within 120s of vesting accrual)",
+      diff >= 0n && diff <= tolerance,
+      `claimable ${fmt(drill.claimable)}, vested - claimed ${fmt(drill.vested - drill.claimed)}, diff ${fmt(diff)}, tolerance ${fmt(tolerance)}`,
     );
   }
   for (const label of ["deployer", "second", "video"]) {
