@@ -51,6 +51,8 @@ the whole claim reverts and no QVEST moves.
 | EVM window opened | `DF01598868ABA88ABCE853D26E4DC8B14F751D094CE4DF336222879C4CC5E743` (hybrid-signed native tx; 1200 blocks, 10 txs) |
 | Second beneficiary (EVM) | `0xD2C678D480690c48e9C909340685AD856f7ddDaE` |
 | Second beneficiary (Cosmos) | `qor16tr834yqdyxy36wfpy6qdpdds4hhmhdwqu2f3v` |
+| Video beneficiary (EVM) | `0x76Ec0922C08140E4DA043819DC79799102DD20Db` |
+| Video beneficiary (Cosmos) | `qor1wmkqjgkqs9qwfksy8qvac7tejypd6gxmtt5dm3` |
 | Drill beneficiary (EVM) | `0xd40fcee41591b61a7a72ec4ecb9003aee35c8e26` |
 | Drill beneficiary (Cosmos) | `qor16s8uaeq4jxmp57nja38vhyqr4m34er3x7ft3xf` |
 | Live-demo beneficiary (EVM) | `0x0A9F2F8fAc9E286D140f9C115D8C4DD28904507b` |
@@ -120,6 +122,36 @@ once on drill day (18 Nov 2026) as the drill proof transaction, via
 subtracts claims from `totalLocked`, so it now reads **56,953.802911
 QVEST** (60,000 − 3,046.197089); the live-demo schedule is untouched and
 still fully locked.
+
+## Live state (verified 19 Nov 2026)
+
+Read from the Diana testnet at block 10368008 (19 Nov 2026 17:04 WIB).
+Reproduce it any time, read-only and without keys, with
+`npm run verify-live`, which compares the live chain against
+[`deployments/schedules.json`](deployments/schedules.json) and prints
+PASS/FAIL per check (56 checks: contract identity, every schedule field,
+both reconciliations, per-beneficiary balances, cliff status, the Native
+allowance invariant, and the pre-cliff rejection receipt).
+
+| # | Schedule | Total (QVEST) | Claimed (QVEST) | Cliff | Duration | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0 | deployer | 100,000 | 100,000 | 60s | 600s | fully claimed |
+| 1 | second | 50,000 | 50,000 | — | 300s | fully claimed |
+| 2 | video | 25,000 | 25,000 | — | 300s | fully claimed |
+| 3 | live-demo | 50,000 | 0 | 7d | 30d | locked; cliff ends 23 Nov 2026 04:31 WIB |
+| 4 | drill | 10,000 | 3,046.197089 | — | 7d | partially claimed |
+
+Totals: scheduled 235,000 QVEST; claimed 178,046.197089 QVEST;
+`totalLocked` 56,953.802911 QVEST; contract balance 821,953.802911 QVEST;
+supply 1,000,000 QVEST. Both reconciliations hold:
+235,000 − 178,046.197089 = 56,953.802911, and
+821,953.802911 + 178,046.197089 = 1,000,000.
+
+The drill schedule keeps vesting (fully vested 23 Nov 2026 04:51 WIB),
+so its claimable amount grows until claimed; the claimed figure above is
+as of the verification block. If it is claimed again, or the live-demo
+cliff passes, refresh `deployments/schedules.json` and this table from
+the chain — `verify-live` fails until they match the live state again.
 
 > **Duplicate deployment (honest note).** During the usage run, an
 > unguarded `main()` in `scripts/deploy.ts` fired when `usage.ts`
@@ -239,18 +271,36 @@ app shows a "not deployed yet" notice instead of the vesting UI.
 ### Tests
 
 ```sh
-npm test        # contract tests on a local in-memory EVM (Ganache) — 9/9 pass
+npm test        # contract tests on a local in-memory EVM (Ganache) — 39/39 pass
 npm run typecheck
 npm run build   # regenerate evidence + typecheck + production frontend build
 ```
 
 The contract tests deploy the real compiled bytecode to a local chain
 with a mock precompile that mimics the chain's reply format, and check
-vesting math, the exact Native payload of every claim (target, target VM,
-JSON), bech32 rejections, atomicity (a failing Native call reverts the
-whole claim), full vesting, and ERC-20 transfers. The test accounts are
+exact vesting math (amounts at the cliff edge, one second into the
+linear phase, mid-vest, one second before the end, and at the end, all
+at exact block timestamps), claim accounting (claimed totals across
+multiple claims, `totalLocked` and contract-balance reconciliation,
+double-claim prevention, schedule isolation), the exact Native payload
+of every claim (target, target VM, JSON), bech32 rejections (wrong
+owner, corrupted checksum, wrong prefix, empty, bad charset character,
+off-by-one length, uppercase), atomicity (a failing Native call reverts
+the whole claim), full vesting, and ERC-20 transfers (including
+`transferFrom` and the max-allowance branch). The test accounts are
 Ganache's built-in deterministic test accounts — public test keys that
 exist only on the throwaway local chain.
+
+### Verify the live state
+
+```sh
+npm run verify-live   # read-only: 56 checks of the live Diana chain vs deployments/schedules.json
+```
+
+No keys or `.env` needed: the script reads the contract and the WDT
+cw20 allowance over the public RPC/LCD and prints PASS/FAIL per check,
+exiting non-zero if anything disagrees with the recorded state. See
+[Live state (verified 19 Nov 2026)](#live-state-verified-19-nov-2026).
 
 ### Recompile the contract
 
@@ -286,7 +336,9 @@ sources, so the artifacts can never drift from the source.
   passed Native address on chain: 42 characters, `qor1` prefix, valid
   bech32 polymod checksum, and the decoded 20 bytes equal `msg.sender`.
   This is the contract's most intricate part and is covered by dedicated
-  tests (wrong owner, corrupted checksum, wrong prefix, empty).
+  tests (wrong owner, corrupted checksum, wrong prefix, empty, bad
+  charset character, off-by-one length, uppercase, corrupted data
+  character).
 - **Atomicity.** The bridge journals the nested Native call, so an EVM
   revert undoes the Native side. The test suite proves it with the mock
   precompile (armed failure → claim reverts, no state changes), and the
@@ -358,6 +410,7 @@ scripts/
   precliff-setup.ts          # fund + PQC-register + window for the live-demo beneficiary
   precliff-claim.ts          # the one pre-cliff claim attempt (reverts on chain)
   precliff-state.ts          # read-only state check for the live-demo schedule
+  verify-live.ts             # read-only live-state verification vs deployments/schedules.json
   window.ts                  # PQC key registration + EVM window helper
   build-artifact.mjs         # regenerate the artifacts from solc output
   gen-evidence.mjs           # generate src/evidence.ts from deployments/usage.json
@@ -370,9 +423,11 @@ src/
   main.tsx                   # providers
 test/
   qore-vest.test.ts          # contract tests on a local EVM
+  qore-vest-math.test.ts     # exact vesting-math + accounting tests on a local EVM
 deployments/
   testnet.json               # written by `npm run deploy`
   usage.json                 # written by `scripts/usage.ts`
+  schedules.json             # expected live state (verified 19 Nov 2026), checked by verify-live.ts
   precliff-rejection.json    # the pre-cliff rejection record (19 Nov 2026)
 docs/
   demo.mp4                   # demo video (≤3 min, real screen recording)

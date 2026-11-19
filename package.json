@@ -36,6 +36,7 @@
     "preview": "vite preview",
     "test": "tsx --test test/*.test.ts",
     "typecheck": "tsc --noEmit",
+    "verify-live": "tsx scripts/verify-live.ts",
     "window": "tsx --env-file=.env scripts/window.ts",
     "prebuild": "node scripts/gen-evidence.mjs"
   },
