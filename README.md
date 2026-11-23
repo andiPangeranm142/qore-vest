@@ -91,7 +91,7 @@ the same evidence with explorer links.
 | claim (second, remainder) — 35,000 QVEST | [`0x9e015196…`](https://explore.qore.network/tx/AB8E8AF5BC902B4A55069E2E318B4EC89BBFCCC70FFA75C4B8D0D44579728F20) — allowance == 50,000 QVEST total ✓ |
 | createVesting (video account, 25,000 QVEST, no cliff, 300s) | [`0xe78305bc…`](https://explore.qore.network/tx/1040FDE84F43C2E42746DF20614FD111EBC2622DA92D5558DE8CAE33BA734649) |
 | claim (video account, on camera) — 25,000 QVEST | [`0x95d0dcbe…`](https://explore.qore.network/tx/387A7DF2673D9ECE685A18D78505D4542C4CF1DDA957A586D092F3ED75A8661E) — allowance == 25,000 QVEST total ✓ |
-| createVesting (live-demo account, 50,000 QVEST, cliff 7d, 30d) | [`0x9532d8ad…`](https://explore.qore.network/tx/A3B90F2BFA1D723868214C6272B9F1F02D3CBF74AE830AEB28BF85E1CCF3B76E) — stays locked, unclaimed |
+| createVesting (live-demo account, 50,000 QVEST, cliff 7d, 30d) | [`0x9532d8ad…`](https://explore.qore.network/tx/A3B90F2BFA1D723868214C6272B9F1F02D3CBF74AE830AEB28BF85E1CCF3B76E) — cliff ended 23 Nov 2026 04:31 WIB; now claimable, claimed still 0 |
 | claim (live-demo account, pre-cliff) — rejected on chain | [`0xb066c478…`](https://explore.qore.network/tx/E6EDD1EE040FB1510D2902FAA4D76D7769672E047CEB5A76A2825705B2EF9353) — reverted ("nothing claimable"), no state changed ✓ |
 | createVesting (drill account, 10,000 QVEST, no cliff, 7d) | [`0x0a0d0c76…`](https://explore.qore.network/tx/16FF820CD3DF1DB4F4ABBE881573A56B0D5A5EF83FB631085F6985567A3722C3) — Q-Day Drill schedule, claimed once on drill day |
 
@@ -101,9 +101,10 @@ units). The video claim is the one shown in
 [`docs/demo.mp4`](docs/demo.mp4) (1:47, real screen recording).
 
 A fourth schedule (50,000 QVEST, 7-day cliff, 30-day duration, created
-16 Nov 2026 via `scripts/live-schedule.ts`) stays locked and unclaimed so
-the demo keeps showing live locked funds through judging. On 19 Nov 2026
-— four days before the cliff ends (23 Nov 2026, 04:31 WIB) — the
+16 Nov 2026 via `scripts/live-schedule.ts`) is past its cliff since
+23 Nov 2026 04:31 WIB and now vests linearly, claimed still 0, so the
+demo keeps showing live vesting funds through judging. On 19 Nov 2026
+— four days before the cliff ended (23 Nov 2026, 04:31 WIB) — the
 beneficiary attempted a claim; it reverted on chain with `nothing
 claimable` (receipt status `reverted`, block 10335895, EVM tx
 [`0xb066c478…`](https://explore.qore.network/tx/E6EDD1EE040FB1510D2902FAA4D76D7769672E047CEB5A76A2825705B2EF9353)),
@@ -123,9 +124,9 @@ subtracts claims from `totalLocked`, so it now reads **56,953.802911
 QVEST** (60,000 − 3,046.197089); the live-demo schedule is untouched and
 still fully locked.
 
-## Live state (verified 19 Nov 2026)
+## Live state (verified 23 Nov 2026)
 
-Read from the Diana testnet at block 10368008 (19 Nov 2026 17:04 WIB).
+Read from the Diana testnet at block 10598414 (23 Nov 2026 13:12 WIB).
 Reproduce it any time, read-only and without keys, with
 `npm run verify-live`, which compares the live chain against
 [`deployments/schedules.json`](deployments/schedules.json) and prints
@@ -138,7 +139,7 @@ allowance invariant, and the pre-cliff rejection receipt).
 | 0 | deployer | 100,000 | 100,000 | 60s | 600s | fully claimed |
 | 1 | second | 50,000 | 50,000 | — | 300s | fully claimed |
 | 2 | video | 25,000 | 25,000 | — | 300s | fully claimed |
-| 3 | live-demo | 50,000 | 0 | 7d | 30d | locked; cliff ends 23 Nov 2026 04:31 WIB |
+| 3 | live-demo | 50,000 | 0 | 7d | 30d | past cliff; vesting, claimed 0 |
 | 4 | drill | 10,000 | 3,046.197089 | — | 7d | partially claimed |
 
 Totals: scheduled 235,000 QVEST; claimed 178,046.197089 QVEST;
@@ -147,10 +148,12 @@ supply 1,000,000 QVEST. Both reconciliations hold:
 235,000 − 178,046.197089 = 56,953.802911, and
 821,953.802911 + 178,046.197089 = 1,000,000.
 
-The drill schedule keeps vesting (fully vested 23 Nov 2026 04:51 WIB),
-so its claimable amount grows until claimed; the claimed figure above is
-as of the verification block. If it is claimed again, or the live-demo
-cliff passes, refresh `deployments/schedules.json` and this table from
+The drill schedule is fully vested (since 23 Nov 2026 04:51 WIB); its
+claimable amount (vested minus claimed) stays until claimed. The
+live-demo schedule's cliff ended 23 Nov 2026 04:31 WIB and it now vests
+linearly over its 30-day duration from the cliff; claimed is still 0.
+The figures above are as of the verification block. If either schedule
+is claimed, refresh `deployments/schedules.json` and this table from
 the chain — `verify-live` fails until they match the live state again.
 
 > **Duplicate deployment (honest note).** During the usage run, an
@@ -300,7 +303,7 @@ npm run verify-live   # read-only: 56 checks of the live Diana chain vs deployme
 No keys or `.env` needed: the script reads the contract and the WDT
 cw20 allowance over the public RPC/LCD and prints PASS/FAIL per check,
 exiting non-zero if anything disagrees with the recorded state. See
-[Live state (verified 19 Nov 2026)](#live-state-verified-19-nov-2026).
+[Live state (verified 23 Nov 2026)](#live-state-verified-23-nov-2026).
 
 ### Recompile the contract
 
@@ -427,7 +430,7 @@ test/
 deployments/
   testnet.json               # written by `npm run deploy`
   usage.json                 # written by `scripts/usage.ts`
-  schedules.json             # expected live state (verified 19 Nov 2026), checked by verify-live.ts
+  schedules.json             # expected live state (verified 23 Nov 2026), checked by verify-live.ts
   precliff-rejection.json    # the pre-cliff rejection record (19 Nov 2026)
 docs/
   demo.mp4                   # demo video (≤3 min, real screen recording)

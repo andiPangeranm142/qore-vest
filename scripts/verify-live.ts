@@ -19,7 +19,8 @@
  *     two reconciliations (scheduled - claimed == totalLocked;
  *     contract balance + claimed == total supply)
  *   - per-beneficiary QVEST balances equal their claimed amounts
- *   - the live-demo schedule is still pre-cliff (vested == claimable == 0)
+ *   - the live-demo schedule is past its cliff (vested/claimable grow
+ *     with time, so only relations are checked, like the drill schedule)
  *   - the drill schedule's vested/claimable values are internally
  *     consistent (they grow with time, so only relations are checked)
  *   - the Native allowance invariant: allowance(QoreVest, beneficiary) ==
@@ -31,9 +32,11 @@
  *     block, with the recorded gas used
  *
  * If a check fails because the on-chain state genuinely moved (e.g. the
- * drill beneficiary claims again, or the live-demo cliff passes on
- * 23 Nov 2026), refresh deployments/schedules.json — and the README table
- * — from the chain, never by editing the script's expectations to match.
+ * drill beneficiary claims again), refresh deployments/schedules.json —
+ * and the README table — from the chain, never by editing the script's
+ * expectations to match. When a schedule genuinely enters a new phase
+ * (the live-demo cliff passed 23 Nov 2026), update the phase checks to
+ * the new phase's relations, mirroring the drill pattern.
  */
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -291,12 +294,26 @@ async function main(): Promise<void> {
   if (liveDemo && liveDemoLive) {
     const cliffEnds = liveDemo.start + liveDemo.cliff;
     check(
-      "live-demo schedule is still pre-cliff",
-      Number(block.timestamp) < cliffEnds,
-      `now ${Number(block.timestamp)}, cliff ends ${cliffEnds} (${new Date(cliffEnds * 1000).toISOString()})`,
+      "live-demo schedule is past its cliff",
+      Number(block.timestamp) >= cliffEnds,
+      `now ${Number(block.timestamp)}, cliff ended ${cliffEnds} (${new Date(cliffEnds * 1000).toISOString()})`,
     );
-    check("live-demo vested is 0", liveDemoLive.vested === 0n, `live ${fmt(liveDemoLive.vested)}`);
-    check("live-demo claimable is 0", liveDemoLive.claimable === 0n, `live ${fmt(liveDemoLive.claimable)}`);
+    // Post-cliff, vested/claimable grow with time (linear over duration
+    // from the cliff), so only relations are checked — same pattern as
+    // the drill schedule below.
+    check(
+      "live-demo vested is between claimed and total (grows with time)",
+      liveDemoLive.vested >= liveDemoLive.claimed && liveDemoLive.vested <= liveDemoLive.total,
+      `vested ${fmt(liveDemoLive.vested)}, claimed ${fmt(liveDemoLive.claimed)}, total ${fmt(liveDemoLive.total)}`,
+    );
+    const liveDemoRate = BigInt(liveDemo.total) / BigInt(liveDemo.duration);
+    const liveDemoTolerance = liveDemoRate * 120n + 1n;
+    const liveDemoDiff = liveDemoLive.claimable - (liveDemoLive.vested - liveDemoLive.claimed);
+    check(
+      "live-demo claimable == vested - claimed (within 120s of vesting accrual)",
+      liveDemoDiff >= 0n && liveDemoDiff <= liveDemoTolerance,
+      `claimable ${fmt(liveDemoLive.claimable)}, vested - claimed ${fmt(liveDemoLive.vested - liveDemoLive.claimed)}, diff ${fmt(liveDemoDiff)}, tolerance ${fmt(liveDemoTolerance)}`,
+    );
     check("live-demo claimed is 0", liveDemoLive.claimed === 0n, `live ${fmt(liveDemoLive.claimed)}`);
   }
   const drill = liveByLabel.get("drill");

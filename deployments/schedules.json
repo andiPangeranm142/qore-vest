@@ -5,7 +5,7 @@
   "contractNativeAddress": "qor1vljgvtpc3f026en0ttp5pl577t7plrmgce7vdj",
   "nativeTarget": "qor14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s93uuqt",
   "network": "qorechain-diana",
-  "note": "Expected live state, read from the Diana testnet at the block above. scripts/verify-live.ts compares the live chain against this file; the README's live-state table mirrors it. Update this file (and the README) only to values read from the chain. The drill schedule's claimed amount grows if the drill beneficiary claims again, and the live-demo schedule's cliff ends 2026-11-22T21:31:58Z (23 Nov 2026 04:31 WIB) — after either event this file must be refreshed from the chain.",
+  "note": "Expected live state, read from the Diana testnet at the block above. scripts/verify-live.ts compares the live chain against this file; the README's live-state table mirrors it. Update this file (and the README) only to values read from the chain. The drill schedule's claimed amount grows if the drill beneficiary claims again. The live-demo schedule's cliff ended 2026-11-22T21:31:58Z (23 Nov 2026 04:31 WIB) \u2014 it is now claimable and vests linearly over its 30-day duration from the cliff; its claimed amount is still 0. After any new claim this file must be refreshed from the chain.",
   "schedules": [
     {
       "beneficiary": "0x1F6A09E6aC96a2Ae802828B19d31B0284b841B9d",
@@ -67,6 +67,6 @@
   "totalLocked": "56953802911",
   "totalScheduled": "235000000000",
   "totalSupply": "1000000000000",
-  "verifiedAt": "2026-11-19T10:04:17Z",
-  "verifiedAtBlock": 10368008
+  "verifiedAt": "2026-11-23T06:12:12Z",
+  "verifiedAtBlock": 10598414
 }
