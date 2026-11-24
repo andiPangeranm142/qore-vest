@@ -12,6 +12,11 @@ the assistant "forza") from a one-paragraph human brief, over build
 sessions on 15–16 November 2026. The human (Aeron) chose the event and
 the Cross-VM category, approved the approach, and owns every step that
 needs a human identity: accounts, funding, registration, and submission.
+Work continued after the launch (19–23 November 2026): a vesting-math
+test suite, a live-chain verification script, the live-demo and Q-Day
+Drill schedules, and a post-cliff refresh of the recorded state — all by
+the same agent, all verified against the live chain before this file was
+updated.
 No code was copied from any other fest project — the concept is the
 category's own example ("EVM token with Native vesting"), implemented
 originally, and the rival Cross-VM entry (VestCross) was never read or
@@ -47,10 +52,13 @@ copied.
    hand-copied); `tsc --noEmit` typecheck; automated contract tests on a
    local EVM (including a mock precompile that mimics the chain's reply
    format); `vite build` for the frontend. On-chain verification was
-   done the same day: the contract deployed, two real schedules created,
-   four real claims executed, and the Native allowance read back after
-   every claim. Nothing in this repo claims an on-chain result that has
-   not happened.
+   done the same day: the contract deployed, real schedules created,
+   real claims executed, and the Native allowance read back after
+   every claim. The live state is re-verified read-only by
+   `scripts/verify-live.ts` (56 checks against
+   `deployments/schedules.json` — contract identity, every schedule
+   field, totals, and the pre-cliff rejection receipt). Nothing in this
+   repo claims an on-chain result that has not happened.
 5. **Secrets discipline.** A fresh testnet-only wallet was generated for
    this project; its mnemonic and private key live only in the local,
    git-ignored `.env` and a mode-`600` file outside the repo. The repo
@@ -66,9 +74,22 @@ copied.
   and records every call; can be armed to fail for atomicity tests).
 - `scripts/deploy.ts` — deployment + deployment record (testnet-only
   chain-id guard; Cosmos-hash resolution for explorer links).
-- `scripts/usage.ts` — the on-chain usage run: two schedules, four
-  claims, one forced revert, with the Native invariant verified after
-  every claim; writes `deployments/usage.json`.
+- `scripts/usage.ts` — the on-chain usage run: four schedules, four
+  claims, one forced revert, and one pre-cliff rejection, with the
+  Native invariant verified after every claim; writes
+  `deployments/usage.json`.
+- `scripts/verify-live.ts` — read-only live-chain verification: 56
+  checks of the Diana chain against `deployments/schedules.json`
+  (added 19 Nov 2026; 56/56 PASS on 23 Nov 2026, block 10598414).
+- `scripts/live-schedule.ts` — the live-demo schedule (50,000 QVEST,
+  7-day cliff, 30-day duration; cliff ended 23 Nov 2026 04:31 WIB, now
+  claimable, claimed still 0).
+- `scripts/precliff-setup.ts`, `scripts/precliff-claim.ts` — the
+  pre-cliff rejection proof: a claim attempted before the cliff reverted
+  on chain ("nothing claimable"), no state changed (recorded in
+  `deployments/precliff-rejection.json`).
+- `scripts/drill-schedule.ts`, `scripts/drill-claim.ts` — the Q-Day
+  Drill schedule (10,000 QVEST) and its drill-day claim.
 - `scripts/setup-second-account.ts` — funds, PQC-registers, and opens a
   window for the second beneficiary account (index 1 of the deployer
   mnemonic).
@@ -77,9 +98,12 @@ copied.
   usage run so the demo page shows the verified evidence.
 - `research/*.mjs` — the live testnet probes that established the
   allowlist, the precompile behaviour, and the contract-as-sender rule.
-- `test/qore-vest.test.ts` — contract tests (artifact checks, vesting
-  math, claim happy path with exact Native payload assertions, bech32
-  rejections, atomicity, full vesting, ERC-20 transfers).
+- `test/qore-vest.test.ts` — contract tests (9 tests: artifact checks,
+  vesting math, claim happy path with exact Native payload assertions,
+  bech32 rejections, atomicity, full vesting, ERC-20 transfers).
+- `test/qore-vest-math.test.ts` — vesting-math tests (30 tests, added
+  19 Nov 2026: cliff boundaries, linear accrual, rounding, and edge
+  cases, computed against the contract's own formulas).
 - `src/*` — the React frontend (vesting UI, QoreX connect, live EVM
   window status, Native allowance read, owner schedule form, evidence
   section), adapted from the `viem-wagmi` template pattern.
@@ -126,7 +150,8 @@ source or chain behaviour rather than guessing:
    the duplicate is documented in the README. Importing either script
    was re-tested to confirm nothing runs.
 
-All fixes are covered by the passing test suite (`npm test`: 9/9).
+All fixes are covered by the passing test suite (`npm test`: 39/39 —
+9 contract tests + 30 vesting-math tests).
 
 ## Human contribution
 
@@ -139,17 +164,18 @@ All fixes are covered by the passing test suite (`npm test`: 9/9).
   X, QoreX), and the final submission.
 - Reviews and approves the demo video and the submission text.
 
-## Verification status (16 Nov 2026)
+## Verification status (updated 25 Nov 2026)
 
 | Check | Result |
 | --- | --- |
 | `solc` 0.8.24 compile | Passes, no warnings shown |
-| `npm test` (contract, local EVM) | 9/9 pass |
+| `npm test` (contract + vesting-math, local EVM) | 39/39 pass (9 contract + 30 math) |
+| `npm run verify-live` (56 live-chain checks) | 56/56 PASS (23 Nov 2026, block 10598414) |
 | `npm run typecheck` | Passes |
 | `npm run build` (frontend) | Passes |
 | No secrets in repo / git history | Checked (see below) |
 | Testnet deploy | **Done 16 Nov 2026 02:52 WIB** — contract `0x67e4862c…f8f68`, deploy tx `0x498b8231…`, Cosmos hash `71E9E424…` |
-| On-chain usage run | **Done 16 Nov 2026** — 2 schedules, 4 claims, 1 forced revert; Native invariant held after every claim (see `deployments/usage.json`) |
+| On-chain usage run | **Done** — 5 schedules (235,000 QVEST), 6 claims, 1 forced revert, 1 pre-cliff rejection; Native invariant held after every claim (see `deployments/usage.json`, `deployments/schedules.json`, `deployments/precliff-rejection.json`, `deployments/video-claim.json`). Live-demo schedule (50,000 QVEST) past its cliff since 23 Nov 2026 04:31 WIB, now claimable, claimed still 0; drill schedule claimed once on drill day |
 | Demo video (≤3 min, real recording) | **Done 16 Nov 2026** — `docs/demo.mp4`, 106.6 s (1:47), 1920×1080 H.264, real Playwright screen recording of a live claim (25,000 QVEST, video account), burned-in captions, explorer confirmation on camera; frames verified at 6 timestamps |
 | Live demo (GitHub Pages) | Done — https://andipangeranm142.github.io/qore-vest/ |
 
