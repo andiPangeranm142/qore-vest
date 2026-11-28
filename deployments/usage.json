@@ -105,6 +105,16 @@
       "stateUnchanged": true,
       "evmTx": "0xb066c4786c96c9872fc6d4c4a40ca1534b36501f360b617c5417b45c5ae7d033",
       "cosmosTx": "E6EDD1EE040FB1510D2902FAA4D76D7769672E047CEB5A76A2825705B2EF9353"
+    },
+    {
+      "action": "claim (live-demo schedule #3, post-cliff)",
+      "note": "Post-cliff claim of the vested 9751.523919 QVEST from the 50,000 QVEST live-demo schedule: released on chain and the Native allowance rose to match the claimed total (allowance == claimed). The cliff that rejected the pre-cliff attempt now releases.",
+      "beneficiary": "0x0A9F2F8fAc9E286D140f9C115D8C4DD28904507b",
+      "amountQvest": "9751.523919",
+      "amountBaseUnits": "9751523919",
+      "status": "success",
+      "evmTx": "0x818ecadf86ff18e76345cb018f486fb5a20de85744936d495aa9a604fda7793f",
+      "cosmosTx": "307FF1F7562632E6C851AE747D56265944F12EBEBF90524DDE77C1A68D802719"
     }
   ],
   "finalVerification": {
