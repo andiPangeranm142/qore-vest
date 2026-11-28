@@ -82,8 +82,8 @@ copied.
   checks of the Diana chain against `deployments/schedules.json`
   (added 19 Nov 2026; 56/56 PASS on 23 Nov 2026, block 10598414).
 - `scripts/live-schedule.ts` — the live-demo schedule (50,000 QVEST,
-  7-day cliff, 30-day duration; cliff ended 23 Nov 2026 04:31 WIB, now
-  claimable, claimed still 0).
+  7-day cliff, 30-day duration; cliff ended 23 Nov 2026 04:31 WIB,
+  claimed 9,751.523919 QVEST on 28 Nov 2026).
 - `scripts/precliff-setup.ts`, `scripts/precliff-claim.ts` — the
   pre-cliff rejection proof: a claim attempted before the cliff reverted
   on chain ("nothing claimable"), no state changed (recorded in
@@ -175,7 +175,7 @@ All fixes are covered by the passing test suite (`npm test`: 39/39 —
 | `npm run build` (frontend) | Passes |
 | No secrets in repo / git history | Checked (see below) |
 | Testnet deploy | **Done 16 Nov 2026 02:52 WIB** — contract `0x67e4862c…f8f68`, deploy tx `0x498b8231…`, Cosmos hash `71E9E424…` |
-| On-chain usage run | **Done** — 5 schedules (235,000 QVEST), 6 claims, 1 forced revert, 1 pre-cliff rejection; Native invariant held after every claim (see `deployments/usage.json`, `deployments/schedules.json`, `deployments/precliff-rejection.json`, `deployments/video-claim.json`). Live-demo schedule (50,000 QVEST) past its cliff since 23 Nov 2026 04:31 WIB, now claimable, claimed still 0; drill schedule claimed once on drill day |
+| On-chain usage run | **Done** — 5 schedules (235,000 QVEST), 7 claims, 1 forced revert, 1 pre-cliff rejection; Native invariant held after every claim (see `deployments/usage.json`, `deployments/schedules.json`, `deployments/precliff-rejection.json`, `deployments/video-claim.json`). Live-demo schedule (50,000 QVEST) past its cliff since 23 Nov 2026 04:31 WIB, claimed 9,751.523919 QVEST on 28 Nov 2026; drill schedule claimed once on drill day |
 | Demo video (≤3 min, real recording) | **Done 16 Nov 2026** — `docs/demo.mp4`, 106.6 s (1:47), 1920×1080 H.264, real Playwright screen recording of a live claim (25,000 QVEST, video account), burned-in captions, explorer confirmation on camera; frames verified at 6 timestamps |
 | Live demo (GitHub Pages) | Done — https://andipangeranm142.github.io/qore-vest/ |
 

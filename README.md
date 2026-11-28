@@ -91,7 +91,7 @@ the same evidence with explorer links.
 | claim (second, remainder) — 35,000 QVEST | [`0x9e015196…`](https://explore.qore.network/tx/AB8E8AF5BC902B4A55069E2E318B4EC89BBFCCC70FFA75C4B8D0D44579728F20) — allowance == 50,000 QVEST total ✓ |
 | createVesting (video account, 25,000 QVEST, no cliff, 300s) | [`0xe78305bc…`](https://explore.qore.network/tx/1040FDE84F43C2E42746DF20614FD111EBC2622DA92D5558DE8CAE33BA734649) |
 | claim (video account, on camera) — 25,000 QVEST | [`0x95d0dcbe…`](https://explore.qore.network/tx/387A7DF2673D9ECE685A18D78505D4542C4CF1DDA957A586D092F3ED75A8661E) — allowance == 25,000 QVEST total ✓ |
-| createVesting (live-demo account, 50,000 QVEST, cliff 7d, 30d) | [`0x9532d8ad…`](https://explore.qore.network/tx/A3B90F2BFA1D723868214C6272B9F1F02D3CBF74AE830AEB28BF85E1CCF3B76E) — cliff ended 23 Nov 2026 04:31 WIB; now claimable, claimed still 0 |
+| createVesting (live-demo account, 50,000 QVEST, cliff 7d, 30d) | [`0x9532d8ad…`](https://explore.qore.network/tx/A3B90F2BFA1D723868214C6272B9F1F02D3CBF74AE830AEB28BF85E1CCF3B76E) — cliff ended 23 Nov 2026 04:31 WIB; claimed 9,751.523919 QVEST on 28 Nov 2026 |
 | claim (live-demo account, pre-cliff) — rejected on chain | [`0xb066c478…`](https://explore.qore.network/tx/E6EDD1EE040FB1510D2902FAA4D76D7769672E047CEB5A76A2825705B2EF9353) — reverted ("nothing claimable"), no state changed ✓ |
 | createVesting (drill account, 10,000 QVEST, no cliff, 7d) | [`0x0a0d0c76…`](https://explore.qore.network/tx/16FF820CD3DF1DB4F4ABBE881573A56B0D5A5EF83FB631085F6985567A3722C3) — Q-Day Drill schedule, claimed once on drill day |
 
@@ -120,11 +120,12 @@ A fifth schedule (10,000 QVEST, no cliff, 7-day duration, created
 beneficiary (`qor16s8uaeq4jxmp57nja38vhyqr4m34er3x7ft3xf`); it was claimed
 once on drill day (18 Nov 2026) as the drill proof transaction, via
 `scripts/drill-claim.ts` — 3,046.197089 QVEST claimed. The contract
-subtracts claims from `totalLocked`, so it now reads **56,953.802911
-QVEST** (60,000 − 3,046.197089); the live-demo schedule is untouched and
-still fully locked.
+subtracts claims from `totalLocked`, so it now reads **47,202.278992
+QVEST** (60,000 − 3,046.197089 − 9,751.523919); the live-demo schedule
+was claimed once post-cliff on 28 Nov 2026 (9,751.523919 QVEST) and
+keeps vesting the remainder.
 
-## Live state (verified 23 Nov 2026)
+## Live state (verified 28 Nov 2026)
 
 Read from the Diana testnet at block 10598414 (23 Nov 2026 13:12 WIB).
 Reproduce it any time, read-only and without keys, with
@@ -142,11 +143,11 @@ allowance invariant, and the pre-cliff rejection receipt).
 | 3 | live-demo | 50,000 | 0 | 7d | 30d | past cliff; vesting, claimed 0 |
 | 4 | drill | 10,000 | 3,046.197089 | — | 7d | partially claimed |
 
-Totals: scheduled 235,000 QVEST; claimed 178,046.197089 QVEST;
-`totalLocked` 56,953.802911 QVEST; contract balance 821,953.802911 QVEST;
+Totals: scheduled 235,000 QVEST; claimed 187,797.721008 QVEST;
+`totalLocked` 47,202.278992 QVEST; contract balance 812,202.278992 QVEST;
 supply 1,000,000 QVEST. Both reconciliations hold:
-235,000 − 178,046.197089 = 56,953.802911, and
-821,953.802911 + 178,046.197089 = 1,000,000.
+235,000 − 187,797.721008 = 47,202.278992, and
+812,202.278992 + 187,797.721008 = 1,000,000.
 
 The drill schedule is fully vested (since 23 Nov 2026 04:51 WIB); its
 claimable amount (vested minus claimed) stays until claimed. The
