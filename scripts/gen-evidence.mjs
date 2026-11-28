@@ -36,6 +36,8 @@ export type EvidenceStep = {
   action: string;
   beneficiary?: string;
   amount?: string;
+  amountQvest?: string;
+  amountBaseUnits?: string;
   start?: number;
   cliff?: number;
   duration?: number;

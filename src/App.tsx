@@ -372,6 +372,7 @@ function Evidence() {
             {s.beneficiary ? ` — ${shorten(s.beneficiary)}` : ""}
             {s.claimedTotal !== undefined ? ` — total claimed ${formatQvest(BigInt(s.claimedTotal))} QVEST` : ""}
             {s.amount !== undefined ? ` — ${formatQvest(BigInt(s.amount))} QVEST` : ""}
+            {s.amountQvest !== undefined ? ` — ${s.amountQvest} QVEST` : ""}
             {s.invariantHolds !== undefined ? ` — Native invariant ${s.invariantHolds ? "holds ✓" : "BROKEN ✗"}` : ""}
             {s.stateUnchanged !== undefined ? ` — state unchanged ${s.stateUnchanged ? "✓" : "✗"}` : ""}
             {s.status ? ` — ${s.status}` : ""}
